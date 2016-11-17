@@ -1,4 +1,5 @@
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 import java.util.Scanner;
 
 /**
@@ -16,33 +17,21 @@ public class ScrabbleConsole {
 
             Scanner scanner = new Scanner(System.in);
 
-            /*System.out.println("Please enter a word:");
-            String word = scanner.next();
-
-            System.out.println("Please enter a letter list :");
-            char[] letters = scanner.next().toCharArray();
-
-            if (dictionary.maybeComposed(word, letters)){
-                System.out.print(word + " may be composed of [");
-                for(char c : letters){
-                    System.out.print(c + ",");
-                }
-                System.out.println("]");
-            } else {
-                System.out.print(word + " may NOT be composed of [");
-                for(char c : letters){
-                    System.out.print(c + ",");
-                }
-                System.out.println("]");
-            }*/
-
             System.out.println("Please enter a letter list :");
             char[] letters = scanner.next().toCharArray();
             String[] wordThatCanBeComposed = dictionary.getWordsThatCanBeComposed(letters);
+            ScrabbleComparator scrabbleComparator = new ScrabbleComparator(letters);
 
             System.out.println(wordThatCanBeComposed.length + " words found :");
+            Arrays.sort(wordThatCanBeComposed, scrabbleComparator);
+
             for(String wordComposed : wordThatCanBeComposed){
-                System.out.println(wordComposed);
+                char[] composition = dictionary.getComposition(wordComposed, letters);
+                System.out.print(wordComposed + " (");
+                for(char c : composition){
+                    System.out.print(c);
+                }
+                System.out.println(") : " + scrabbleComparator.wordValue(wordComposed) + " points");
             }
 
         } catch (FileNotFoundException e){

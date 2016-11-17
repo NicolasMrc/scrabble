@@ -115,6 +115,13 @@ public class Dictionary {
     }
 
 
+    /**
+     * permet de definir les mot qui peuvent etre composés a partir des lettres disponibles
+     * @param letters
+     *      les lettre disponible
+     * @return
+     *      les mots possibles
+     */
     public  String[] getWordsThatCanBeComposed(char[] letters){
         ArrayList<String> wordThatCanBeComposed = new ArrayList<>();
         for (String dicoWord : this.wordsList){
@@ -123,5 +130,37 @@ public class Dictionary {
             }
         }
         return wordThatCanBeComposed.stream().toArray(String[]::new);
+    }
+
+    /**
+     * renvoi les lettres utilisée parmis les letters ppour former le mot
+     * @param word
+     *      le mot former
+     * @param letters
+     *      les lettre disponibles
+     * @return
+     *      les lettres utilisées
+     */
+    public char[] getComposition(String word, char[] letters){
+        word = this.replaceFrenchCharacter(word);
+        char[] composition = new char[word.length()];
+        int i = 0;
+
+        for (char letter : letters) {
+            if (word.indexOf(letter) != -1) {
+                composition[i] = letter;
+                StringBuilder sb = new StringBuilder(word);
+                sb.deleteCharAt(word.indexOf(letter));
+                word = sb.toString();
+                i ++;
+            }
+        }
+
+        for(int j = word.length(); j > 0; j--){
+            composition[i] = '*';
+            i++;
+        }
+
+        return composition;
     }
 }
