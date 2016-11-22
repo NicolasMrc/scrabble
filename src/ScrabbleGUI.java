@@ -56,10 +56,16 @@ public class ScrabbleGUI extends JFrame{
         searchButton.addMouseListener(new MouseAdapter(){
             @Override
             public void mousePressed(MouseEvent e) {
-                if (!accroches.getText().equals("")){
-                    searchResultsWithAccroches();
+                if(letters.getText().length() == 0){
+                    JOptionPane.showMessageDialog(scrabblePanel, "Vous devez au moins specifier une lettre", "Erreur", JOptionPane.ERROR_MESSAGE);
+                } else if (letters.getText().length() > 7) {
+                    JOptionPane.showMessageDialog(scrabblePanel, "Vous ne pouvez avoir plus de 7 lettres en main", "Erreur", JOptionPane.ERROR_MESSAGE);
                 } else {
-                    searchResults();
+                    if (!accroches.getText().equals("")){
+                        searchResultsWithAccroches();
+                    } else {
+                        searchResults();
+                    }
                 }
             }
         });
@@ -95,6 +101,7 @@ public class ScrabbleGUI extends JFrame{
         if(wordThatCanBeComposed[0] != null){
             this.displayTop(wordThatCanBeComposed[0]);
         }
+
     }
 
     /**
@@ -125,7 +132,7 @@ public class ScrabbleGUI extends JFrame{
         this.result.setMinimumSize(new Dimension(50, 30*wordThatCanBeComposed.size()));
         this.result.setText(result);
 
-        if(wordArray[0] != null){
+        if(wordArray.length != 0){
             this.displayTop(wordArray[0]);
         }
     }
