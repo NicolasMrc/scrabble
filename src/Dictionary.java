@@ -1,7 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * La classe dictionnaire
@@ -29,7 +28,7 @@ public class Dictionary {
      */
     public Dictionary(String FileUrl) throws FileNotFoundException{
         Scanner scan = new Scanner(new File(FileUrl));
-        int size = Integer.valueOf(scan.next());
+        int size = scan.nextInt();
         this.wordsList = new String[size];
 
         for(int i = 0; i < size; i++) {
@@ -86,11 +85,7 @@ public class Dictionary {
                     word = sb.toString();
                 }
             }
-            if (word.length() <= nbJocker) {
-                return true;
-            } else {
-                return false;
-            }
+            return word.length() <= nbJocker;
         }
     }
 
@@ -102,7 +97,6 @@ public class Dictionary {
      *      le mot sans caractere specifique
      */
     public String replaceFrenchCharacter(String s){
-        //normalizer permet d'enlever les accents et la cedille du ç
         s = s.replaceAll("[éèêë]", "e");
         s = s.replaceAll("[äâà]", "a");
         s = s.replaceAll("[ùûü]", "u");
@@ -142,23 +136,177 @@ public class Dictionary {
      *      les lettres utilisées
      */
     public char[] getComposition(String word, char[] letters){
+        if(word !=  null) {
+            word = this.replaceFrenchCharacter(word);
+            char[] composition = new char[word.length()];
+            int i = 0;
+
+            for (char c : word.toCharArray()) {
+                boolean replaced = false;
+                for (char letter : letters) {
+                    if (c == letter) {
+                        composition[i] = letter;
+                        StringBuilder sb = new StringBuilder(word);
+                        sb.deleteCharAt(0);
+                        word = sb.toString();
+                        i++;
+                        replaced = true;
+                        break;
+                    }
+                }
+                if (!replaced) {
+                    composition[i] = '*';
+                    StringBuilder sb = new StringBuilder(word);
+                    sb.deleteCharAt(0);
+                    word = sb.toString();
+                    i++;
+                }
+            }
+            return composition;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * permet de retourner les mots qui peuvent etre composé quand quand des accroches sont utilisée
+     * @param accrochePattern
+     *      le pattern d'accroche
+     * @param letters
+     *      les lettre utilisées
+     * @return
+     *      la liste de mot qui peuvent etre composés
+     */
+    public  ArrayList<String> getWordsThatCanBeComposedWithAccroches(String accrochePattern, char[] letters) {
+        ArrayList<Accroche> accroches = buildAccrocheList(accrochePattern);
+
+        StringBuilder sb = new StringBuilder(64);
+        sb.append(letters);
+        for(Accroche accroche : accroches){
+            sb.append(accroche.getLetter());
+        }
+
+        char[] letterAndAccroches = sb.toString().toCharArray();
+
+        List<String> list = Arrays.asList(getWordsThatCanBeComposed(letterAndAccroches));
+        ArrayList<String> wordList = new ArrayList<>(list);
+
+        String regEx = buildRegexFromAccroches(accroches);
+
+        Iterator<String> iter = wordList.iterator();
+
+        ArrayList<String> matchingAccroche = new ArrayList<>();
+
+        for (String word : wordList) {
+            if (word.matches(regEx)) {
+                matchingAccroche.add(word);
+            }
+        }
+
+        return matchingAccroche;
+    }
+
+    /**
+     * permet de construit la regEx a partir des accroches disponibles
+     * @param accroches
+     *      la liste des accorches utilisée
+     * @return
+     *      la regEx
+     */
+    private static String buildRegexFromAccroches(ArrayList<Accroche> accroches){
+        String regEx = "([a-z]?)+";
+        for(Accroche accroche : accroches){
+            if(accroche.getOffset() != 0){
+                regEx += "([a-z]{" + (accroche.getOffset()-1) + "})";
+            }
+            regEx += "([" + accroche.getLetter() + "])";
+        }
+        regEx += "([a-z]?)+";
+        return regEx;
+    }
+
+    /**
+     * permet de construire un liste d'accroche a partir de la chaine de caractere
+     * @param accrochePattern
+     *      la chaine de caractere
+     * @return
+     *      la liste d'accroches
+     */
+    private static ArrayList<Accroche> buildAccrocheList(String accrochePattern){
+        ArrayList<Accroche> accroches = new ArrayList<>();
+
+        while(accrochePattern.charAt(0) == '-'){
+            StringBuilder sb = new StringBuilder(accrochePattern);
+            sb.deleteCharAt(0);
+            accrochePattern = sb.toString();
+        }
+
+        for(int i = 0; i < accrochePattern.length(); i++){
+
+            char letter = accrochePattern.charAt(i);
+
+            if(letter != '-'){
+                int offset = 0;
+                if(accroches.size() != 0){
+                    offset = i - accroches.get(accroches.size() - 1).getOffset();
+                }
+                accroches.add(new Accroche(letter, offset));
+            }
+        }
+
+        return accroches;
+    }
+
+    /**
+     * permet de determiner la composition d'un mot a partir des lettre et accroches utilisées
+     * @param word
+     *      le mot
+     * @param letters
+     *      les lettres disponible
+     * @param accroches
+     *      les accroches utilisée
+     * @return
+     *      la composition
+     */
+    public char[] getCompositionWithAccroches(String word, char[] letters, String accroches){
         word = this.replaceFrenchCharacter(word);
         char[] composition = new char[word.length()];
         int i = 0;
 
-        for (char letter : letters) {
-            if (word.indexOf(letter) != -1) {
-                composition[i] = letter;
-                StringBuilder sb = new StringBuilder(word);
-                sb.deleteCharAt(word.indexOf(letter));
-                word = sb.toString();
-                i ++;
+        for(char c : word.toCharArray()){
+            boolean replaced = false;
+            for (char letter : letters) {
+                if (c == letter) {
+                    composition[i] = letter;
+                    StringBuilder sb = new StringBuilder(word);
+                    sb.deleteCharAt(0);
+                    word = sb.toString();
+                    i++;
+                    replaced = true;
+                    break;
+                }
             }
-        }
+            if(!replaced) {
+                for (char accroche : accroches.toCharArray()) {
+                    if (c == accroche) {
+                        composition[i] = '-';
+                        StringBuilder sb = new StringBuilder(word);
+                        sb.deleteCharAt(0);
+                        word = sb.toString();
+                        i++;
+                        replaced = true;
+                        break;
+                    }
+                }
+            }
+            if(!replaced) {
+                composition[i] = '*';
+                StringBuilder sb = new StringBuilder(word);
+                sb.deleteCharAt(0);
+                word = sb.toString();
+                i++;
+            }
 
-        for(int j = word.length(); j > 0; j--){
-            composition[i] = '*';
-            i++;
         }
 
         return composition;

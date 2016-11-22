@@ -12,7 +12,7 @@ public class ScrabbleConsole {
 
         try{
             Dictionary dictionary = new Dictionary("resources/dico.txt");
-            String[] wordList = (dictionary.getWordsList());
+            String[] wordList = dictionary.getWordsList();
             System.out.println(wordList.length + " loaded from " + wordList[0] + " to " + wordList[wordList.length-1] );
 
             Scanner scanner = new Scanner(System.in);
