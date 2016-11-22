@@ -130,6 +130,11 @@ public class ScrabbleGUI extends JFrame{
         }
     }
 
+    /**
+     * permet d'afficher le meilleur mot trouvé
+     * @param bestWord
+     *      le meilleur mot trouvé
+     */
     public void displayTop(String bestWord){
         this.bestWordPanel.removeAll();
         this.bestWordPanel.repaint();
