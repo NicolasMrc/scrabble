@@ -28,8 +28,6 @@ And of course Dillinger itself is open source with a [public repository][dill]
 Scrabble Assistant does not requires anything to run.
 Just clone the project & Run the main class with any IDE !
 
-Download and extract the [latest pre-built release](https://github.com/joemccann/dillinger/releases).
-
 ### Todos
 
  - full gaming plate
