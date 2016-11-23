@@ -10,8 +10,6 @@ Scrabble Assistant is a powerfull cheating tool for scrabble with mutliple featu
 
 Scrabble Assistant is developped in Java
 
-This text you see here is *actually* written in Markdown! To get a feel for Markdown's syntax, type some text into the left window and watch the results in the right.
-
 ### Tech
 
 Scrabble Assistant is based on cool techs to work properly:
@@ -20,8 +18,6 @@ Scrabble Assistant is based on cool techs to work properly:
 * [SWING] - Awesome GUI librairy
 * [Intellij Idea] - Best IDE of all time
 
-And of course Dillinger itself is open source with a [public repository][dill]
- on GitHub.
 
 ### Installation
 
