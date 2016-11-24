@@ -1,6 +1,5 @@
 import java.io.FileNotFoundException;
-import java.util.Arrays;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * Created by Nico on 15/11/2016.
@@ -11,21 +10,25 @@ public class ScrabbleConsole {
         System.out.println("Welcome to the Scrabble assistant !");
 
         try{
-            Dictionary dictionary = new Dictionary("resources/dico.txt");
-            String[] wordList = dictionary.getWordsList();
-            System.out.println(wordList.length + " loaded from " + wordList[0] + " to " + wordList[wordList.length-1] );
+            Dictionary dictionary = new Dictionary("resources/words_fr.txt");
+            HashMap<Integer, List<String>> wordList = dictionary.getWordsList();
 
             Scanner scanner = new Scanner(System.in);
 
             System.out.println("Please enter a letter list :");
             char[] letters = scanner.next().toCharArray();
-            String[] wordThatCanBeComposed = dictionary.getWordsThatCanBeComposed(letters);
+            List<String> wordThatCanBeComposed = dictionary.getWordsThatCanBeComposed(letters);
             ScrabbleComparator scrabbleComparator = new ScrabbleComparator(letters);
 
-            System.out.println(wordThatCanBeComposed.length + " words found :");
-            Arrays.sort(wordThatCanBeComposed, scrabbleComparator);
+            System.out.println(wordThatCanBeComposed.size() + " words found :");
 
-            for(String wordComposed : wordThatCanBeComposed){
+            List<String> sortedList = new ArrayList<>();
+
+            Comparator<String> byWordValue = (s1, s2) -> Integer.compare(scrabbleComparator.wordValue(s1), scrabbleComparator.wordValue(s2));
+
+            wordThatCanBeComposed.stream().sorted(byWordValue).forEach(e -> sortedList.add(e));
+
+            for(String wordComposed : sortedList){
                 char[] composition = dictionary.getComposition(wordComposed, letters);
                 System.out.print(wordComposed + " (");
                 for(char c : composition){

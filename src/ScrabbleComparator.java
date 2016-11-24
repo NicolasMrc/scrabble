@@ -4,7 +4,7 @@ import java.util.Comparator;
  * Classe qui compare
  * Created by Nico on 17/11/2016.
  */
-public class ScrabbleComparator implements Comparator<String>{
+public class ScrabbleComparator{
 
     /**
      * les lettres disponibles
@@ -72,25 +72,6 @@ public class ScrabbleComparator implements Comparator<String>{
         Dictionary dictionary = new Dictionary();
         char[] composition = dictionary.getComposition(word, this.letters);
         return this.lettersValue(composition);
-    }
-
-    /**
-     * comparaison entre deux string
-     * @param s1
-     *      la premiere chaine
-     * @param s2
-     *      la deuxieme chaine
-     * @return
-     *      l'ordre d'apparition de la chaine
-     */
-    public int compare(String s1, String s2){
-        if(wordValue(s1) > wordValue(s2)){
-            return -1;
-        } else if (wordValue(s1) < wordValue(s2)){
-            return 1;
-        } else {
-            return 0;
-        }
     }
 }
 

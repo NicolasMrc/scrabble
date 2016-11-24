@@ -7,42 +7,43 @@ import java.util.*;
  * Created by Nico on 15/11/2016.
  */
 public class Dictionary {
-    private String[] wordsList;
+    private HashMap<Integer, List<String>> wordsMap = new HashMap<>();
 
-    /**
-     * constructeur vide initialisant la liste de mots avec 5 mot pour tester
-     */
     public Dictionary(){
-        this.wordsList = new String[5];
-        this.wordsList[0] = "abricot";
-        this.wordsList[1] = "châtaigne";
-        this.wordsList[2] = "groseille";
-        this.wordsList[3] = "pomme";
-        this.wordsList[4] = "tomate";
+
     }
 
     /**
-     * constructeur permettant de remplir la liste de mot grace a un fichier
+     * Constructeur permettant de lire les mots dans le fichier dont l'url est passée en parametre
+     * et les classer dans des List contenu dans la HashMap a l'index correspondant au nombre de caractere du mot
      * @param FileUrl
      *      l'url du fichier
      */
     public Dictionary(String FileUrl) throws FileNotFoundException{
         Scanner scan = new Scanner(new File(FileUrl));
         int size = scan.nextInt();
-        this.wordsList = new String[size];
 
         for(int i = 0; i < size; i++) {
-            this.wordsList[i] = scan.next();
+            String word = scan.next();
+            if(word.length() > 1) {
+                if (this.wordsMap.get(word.length()) != null) {
+                    this.wordsMap.get(word.length()).add(word);
+                } else {
+                    ArrayList<String> newList = new ArrayList<>();
+                    newList.add(word);
+                    this.wordsMap.put(word.length(), newList);
+                }
+            }
         }
     }
 
     /**
-     * getter de la liste de mot
+     * getter de la map contenant les listes de mots
      * @return
      *      la liste de mot
      */
-    public String[] getWordsList() {
-        return wordsList;
+    public HashMap<Integer, List<String>> getWordsList() {
+        return this.wordsMap;
     }
 
     /**
@@ -53,7 +54,7 @@ public class Dictionary {
      *      true si le mot est valide
      */
     public boolean isValidWord(String word){
-        for(String dicoWord : this.wordsList){
+        for(String dicoWord : this.wordsMap.get(word.length())){
             if(word.equalsIgnoreCase(dicoWord)){
                 return true;
             }
@@ -116,14 +117,20 @@ public class Dictionary {
      * @return
      *      les mots possibles
      */
-    public  String[] getWordsThatCanBeComposed(char[] letters){
+    public  List<String> getWordsThatCanBeComposed(char[] letters){
         ArrayList<String> wordThatCanBeComposed = new ArrayList<>();
-        for (String dicoWord : this.wordsList){
-            if (maybeComposed(dicoWord, letters)){
-                wordThatCanBeComposed.add(dicoWord);
+        for (int nbLetter = letters.length; nbLetter > 0 ; nbLetter-- ){
+            List<String> wordList = this.wordsMap.get(nbLetter);
+            if (wordList != null) {
+                for (String dicoWord : wordList ){
+                    if (maybeComposed(dicoWord, letters)){
+                        wordThatCanBeComposed.add(dicoWord);
+                    }
+                }
             }
         }
-        return wordThatCanBeComposed.stream().toArray(String[]::new);
+
+        return wordThatCanBeComposed;
     }
 
     /**
@@ -188,7 +195,7 @@ public class Dictionary {
 
         char[] letterAndAccroches = sb.toString().toCharArray();
 
-        List<String> list = Arrays.asList(getWordsThatCanBeComposed(letterAndAccroches));
+        List<String> list = getWordsThatCanBeComposed(letterAndAccroches);
         ArrayList<String> wordList = new ArrayList<>(list);
 
         String regEx = buildRegexFromAccroches(accroches);
